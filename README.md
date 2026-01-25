@@ -6,9 +6,9 @@ Professional translation from English to Thai using **Claude API** or **DeepL AP
 
 ```
 INPUT                              OUTPUT
-─────                              ──────
-📊 English Presentation    →    📊 Thai Presentation
-📝 English Script          →    📝 Thai Script (as speaker notes)
+-----                              ------
+English Presentation       ->      Thai Presentation
+English Script             ->      Thai Script (as speaker notes)
 ```
 
 ---
@@ -83,15 +83,15 @@ Get your DeepL API key at: https://www.deepl.com/pro-api
 
 ```
 presentations/english/
-├── my_presentation.pptx    ← Your English PowerPoint
-└── my_script.txt           ← Your English script
+├── my_presentation.pptx    <- Your English PowerPoint
+└── my_script.txt           <- Your English script
 ```
 
 **Option B: You only have PowerPoint (no script yet)**
 
 ```
 presentations/english/
-└── my_presentation.pptx    ← Your English PowerPoint
+└── my_presentation.pptx    <- Your English PowerPoint
 ```
 
 ### Step 2: Create or Format Your Script
@@ -149,9 +149,9 @@ python translate_deepl.py presentations/english/my_presentation_with_notes.pptx
 **Output:** `presentations/english/my_presentation_with_notes_thai.pptx`
 
 DeepL translates:
-- ✅ All slide content (text, titles, bullets)
-- ✅ All speaker notes (your scripts)
-- ✅ Preserves formatting, images, layouts
+- All slide content (text, titles, bullets)
+- All speaker notes (your scripts)
+- Preserves formatting, images, layouts
 
 Move to Thai folder:
 
@@ -169,7 +169,7 @@ python pptx_scripts.py list presentations/thai/my_presentation.pptx
 ### Step 6: Present with Scripts
 
 1. Open the Thai PowerPoint
-2. Start slideshow: **F5** (or Slideshow → From Beginning)
+2. Start slideshow: **F5** (or Slideshow -> From Beginning)
 3. Enter Presenter View:
    - **Windows:** Alt + F5
    - **Mac:** Option + Return
@@ -177,21 +177,20 @@ python pptx_scripts.py list presentations/thai/my_presentation.pptx
 **Presenter View:**
 
 ```
-┌────────────────────────────────────────────────┐
-│   ┌──────────────────┐  ┌──────────────────┐  │
-│   │  Current Slide   │  │   Next Slide     │  │
-│   │                  │  │   (preview)      │  │
-│   └──────────────────┘  └──────────────────┘  │
-│                                                │
-│   ┌────────────────────────────────────────┐  │
-│   │  Speaker Notes (Your Thai Script):     │  │
-│   │  ยินดีต้อนรับทุกท่านสู่การนำเสนอวันนี้      │  │
-│   │  ผมรู้สึกตื่นเต้นที่จะแบ่งปันผลประกอบการ...  │  │
-│   └────────────────────────────────────────┘  │
-│   [Timer: 00:05:32]        [Slide 1 of 10]    │
-└────────────────────────────────────────────────┘
-        ↑ Only YOU see this
-        ↓ Audience sees only the slide
++------------------------------------------------+
+|   +------------------+  +------------------+   |
+|   |  Current Slide   |  |   Next Slide     |   |
+|   |                  |  |   (preview)      |   |
+|   +------------------+  +------------------+   |
+|                                                |
+|   +----------------------------------------+   |
+|   |  Speaker Notes (Your Thai Script):     |   |
+|   |  ...                                   |   |
+|   +----------------------------------------+   |
+|   [Timer: 00:05:32]        [Slide 1 of 10]     |
++------------------------------------------------+
+        ^ Only YOU see this
+        v Audience sees only the slide
 ```
 
 ---
@@ -253,7 +252,7 @@ python pptx_scripts.py list presentations/thai/quarterly_report.pptx
 | `python translate_deepl.py all` | Translate everything |
 | `python translate_deepl.py <file>` | Translate single file |
 | `python translate_deepl.py usage` | Check API usage |
-| `--formal` | Use formal Thai (ครับ/ค่ะ) |
+| `--formal` | Use formal Thai |
 | `--informal` | Use informal Thai |
 
 ### Claude Translator (`translate.py`)
@@ -272,57 +271,81 @@ python pptx_scripts.py list presentations/thai/quarterly_report.pptx
 |---------|-------------|
 | `python quality_check.py <translated.pptx>` | Check translation quality |
 | `python quality_check.py <translated.pptx> <original.pptx>` | Compare with original |
-| `--save` | Save report to JSON file |
+| `--html` | Save HTML report only |
+| `--text` | Save text report only |
 
 ---
 
 ## Quality Check Process
 
-After translation, run the quality check to identify potential issues:
+After translation, run the quality check to identify potential issues.
+The translated slides remain **untouched** - issues are flagged in a separate report.
 
 ```bash
 python quality_check.py my_presentation_thai.pptx my_presentation.pptx
 ```
 
+### Output Files
+
+| File | Description |
+|------|-------------|
+| `*_thai.pptx` | Clean translated slides (unchanged) |
+| `*_quality_report.html` | HTML report - open in browser |
+| `*_quality_report.txt` | Text report - for terminal/logs |
+
 ### What It Checks
 
 | Severity | Issue Type | Description |
 |----------|------------|-------------|
-| 🔴 Critical | Character Encoding | Garbled or corrupted text |
-| 🟡 Warning | Untranslated Text | English words that should be Thai |
-| 🟡 Warning | Missing Numbers | Numbers lost in translation |
-| 🟡 Warning | Length Difference | Text significantly longer/shorter |
-| 🔵 Info | Empty Content | Empty slides or notes |
-| 🔵 Info | Formatting | Unmatched brackets/parentheses |
+| Critical | Character Encoding | Garbled or corrupted text |
+| Warning | Untranslated Text | English words that should be Thai |
+| Warning | Missing Numbers | Numbers lost in translation |
+| Warning | Length Difference | Text significantly longer/shorter |
+| Info | Empty Content | Empty slides or notes |
+| Info | Formatting | Unmatched brackets/parentheses |
 
 ### Sample Output
 
 ```
-🔍 Quality Check: presentation_thai.pptx
-============================================================
+======================================================================
+TRANSLATION QUALITY REPORT
+======================================================================
 
-🟢 Quality Score: 85/100 (Good)
-------------------------------------------------------------
+File: presentation_thai.pptx
+Date: 2026-01-25
 
-📊 Summary:
-   Slides analyzed: 10
-   Total issues: 5
-   🟡 Warnings: 3
-   🔵 Info: 2
+Quality Score: 85/100 (Good)
 
-📋 Issues by Type:
-   • Untranslated Text: 2
-   • Text Length: 2
-   • Empty Content: 1
+----------------------------------------------------------------------
+SUMMARY
+----------------------------------------------------------------------
+Total Slides: 10
+Total Issues: 5
+  Warnings: 3
+  Info: 2
 
-🟡 WARNINGS (Should Review):
-   Slide 3: English words found: Customer, Revenue, Growth
-      → Review if these should be translated to Thai
-   Slide 7: Translation is 45% longer than original
-      → May not fit in slide layout - consider shortening
+----------------------------------------------------------------------
+ISSUES BY SLIDE
+----------------------------------------------------------------------
 
-📍 Slides Needing Review: 3, 7
-============================================================
++-- SLIDE 3 (1 issue)
+|
+|  [Warning] Untranslated Text
+|     Location: Slide Content
+|     Found: Customer, Revenue, Growth
+|     -> Review if these English words should be translated to Thai
++--------------------------------------------------
+
+----------------------------------------------------------------------
+SLIDES TO REVIEW
+----------------------------------------------------------------------
+
+Review these slides: 3, 7
+
+======================================================================
+NOTE: The translated presentation file is NOT modified.
+This report is for review purposes only.
+======================================================================
 ```
 
 ### Complete Workflow with Quality Check
@@ -331,10 +354,10 @@ python quality_check.py my_presentation_thai.pptx my_presentation.pptx
 # 1. Translate
 python translate_deepl.py my_presentation.pptx
 
-# 2. Quality Check
+# 2. Quality Check (generates separate report)
 python quality_check.py my_presentation_thai.pptx my_presentation.pptx
 
-# 3. Review flagged slides and fix if needed
+# 3. Open report and presentation side by side to review
 
 # 4. Present!
 ```
