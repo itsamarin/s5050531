@@ -1,6 +1,6 @@
 # English to Thai Translation Project
 
-Professional translation from English to Thai using **Claude API** or **DeepL API**.
+Professional translation from English to Thai using **Claude API**, **DeepL API**, or **GPT-5**.
 
 ## Quick Start
 
@@ -13,21 +13,66 @@ English Script             ->      Thai Script (as speaker notes)
 
 ---
 
-## Two Translation Engines
+## Three Translation Engines
 
-| Feature | Claude API | DeepL API |
-|---------|------------|-----------|
-| **Best for** | Scripts, nuanced content | Presentations (.pptx) |
-| **Format preservation** | Text only | Full document formatting |
-| **PPTX support** | No (text only) | Yes (native) |
-| **Review pass** | Yes (two-pass) | No |
-| **Glossary** | Custom JSON | DeepL glossary |
-| **Script** | `translate.py` | `translate_deepl.py` |
+| Feature | Claude API | DeepL API | GPT-5 |
+|---------|------------|-----------|-------|
+| **Best for** | Scripts, nuanced content | Presentations (.pptx) | All file types |
+| **Format preservation** | Text only | Full document formatting | Structure preserved |
+| **PPTX support** | No (text only) | Yes (native) | Yes (.pptx, .docx, .xlsx) |
+| **DOCX support** | No | Yes | Yes |
+| **XLSX support** | No | Yes | Yes |
+| **Review pass** | Yes (two-pass) | No | No |
+| **Glossary** | Custom JSON | DeepL glossary | Custom JSON |
+| **Script** | `translate.py` | `translate_deepl.py` | `translate_gpt5.py` |
 
 ### Recommendation
 
-- **Presentations (.pptx)**: Use **DeepL** - preserves slides, formatting, images
-- **Scripts (.txt, .md)**: Use **Claude** - better context understanding, review pass
+- **Presentations (.pptx)**: Use **DeepL** or **GPT-5** — both preserve structure
+- **Word documents (.docx)**: Use **GPT-5** or **DeepL**
+- **Excel spreadsheets (.xlsx)**: Use **GPT-5**
+- **Scripts (.txt, .md)**: Use **Claude** — better context, review pass
+
+---
+
+## GPT-5 Translator (`translate_gpt5.py`)
+
+Translates `.pptx`, `.docx`, and `.xlsx` files while preserving structure and formatting.
+
+### Setup
+
+Add your OpenAI API key to `.env`:
+```
+OPENAI_API_KEY=sk-...
+```
+
+### Usage
+
+```bash
+# Translate a single file (output: <name>_thai.<ext> in same folder)
+python translate_gpt5.py my_slides.pptx
+python translate_gpt5.py report.docx
+python translate_gpt5.py data.xlsx
+
+# Translate all files in presentations/english/
+python translate_gpt5.py presentations
+
+# Translate all files in scripts/english/
+python translate_gpt5.py scripts
+
+# Translate everything
+python translate_gpt5.py all
+```
+
+### What it translates
+
+| File type | What is translated |
+|-----------|-------------------|
+| `.pptx` | All slide text + speaker notes |
+| `.docx` | Body paragraphs, tables, headers, footers |
+| `.xlsx` | All string cell values (skips formulas & numbers) |
+
+Uses `glossary.json` for consistent terminology (same glossary as Claude engine).
 
 ---
 
@@ -265,43 +310,53 @@ python pptx_scripts.py list presentations/thai/quarterly_report.pptx
 | `python translate.py interactive` | Test mode |
 | `--no-review` | Skip review pass (faster) |
 
-### Quality Check (`quality_check.py`)
+### Quality Check — GPT-5 (`quality_check.py`)
+
+Supports `.pptx`, `.docx`, and `.xlsx`. Uses GPT-5 for semantic analysis when `OPENAI_API_KEY` is set; falls back to rule-based checks otherwise.
 
 | Command | Description |
 |---------|-------------|
-| `python quality_check.py <translated.pptx>` | Check translation quality |
-| `python quality_check.py <translated.pptx> <original.pptx>` | Compare with original |
+| `python quality_check.py <translated_file>` | Check any supported file |
+| `python quality_check.py <translated_file> <original_file>` | Compare with original |
 | `--html` | Save HTML report only |
 | `--text` | Save text report only |
+| `--no-save` | Print to console only |
 
 ---
 
 ## Quality Check Process
 
 After translation, run the quality check to identify potential issues.
-The translated slides remain **untouched** - issues are flagged in a separate report.
+The translated file is **never modified** — issues are flagged in a separate report only.
 
 ```bash
-python quality_check.py my_presentation_thai.pptx my_presentation.pptx
+# PowerPoint
+python quality_check.py presentations/thai/my_slides_thai.pptx presentations/english/my_slides.pptx
+
+# Word document
+python quality_check.py report_thai.docx report_english.docx
+
+# Excel spreadsheet
+python quality_check.py data_thai.xlsx data_english.xlsx
 ```
 
 ### Output Files
 
 | File | Description |
 |------|-------------|
-| `*_thai.pptx` | Clean translated slides (unchanged) |
-| `*_quality_report.html` | HTML report - open in browser |
-| `*_quality_report.txt` | Text report - for terminal/logs |
+| `*_quality_report.html` | HTML report — open in browser (recommended) |
+| `*_quality_report.txt` | Text report — for terminal/logs |
 
-### What It Checks
+### What GPT-5 Checks
 
 | Severity | Issue Type | Description |
 |----------|------------|-------------|
-| Critical | Character Encoding | Garbled or corrupted text |
+| Critical | Semantic Error | Translation conveys wrong meaning |
 | Warning | Untranslated Text | English words that should be Thai |
-| Warning | Missing Numbers | Numbers lost in translation |
-| Warning | Length Difference | Text significantly longer/shorter |
-| Info | Empty Content | Empty slides or notes |
+| Warning | Number Mismatch | Numbers lost or changed in translation |
+| Warning | Missing Content | Content present in original but absent in translation |
+| Warning | Awkward Phrasing | Thai text is unnatural or overly literal |
+| Info | Formatting Issue | Punctuation or structure inconsistency |
 | Info | Formatting | Unmatched brackets/parentheses |
 
 ### Sample Output
